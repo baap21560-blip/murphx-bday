@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Gift</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+@font-face {
+  font-family: 'Lemon Milk';
+  src: url('https://db.onlinewebfonts.com/t/718a746f364746864115f5d625d911b3.woff2') format('woff2');
+}
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  --primary: #0ea5e9;
+  --dark-blue: #1d4ed8;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* Card */
+.gift-card {
+  background: white;
+  padding: 3rem 2.5rem;
+  border-radius: 30px;
+  box-shadow: 0 40px 100px rgba(0,50,100,0.2);
+  text-align: center;
+  max-width: 650px;
+  animation: fadeIn 1.2s ease forwards;
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+h1 {
+  font-family: 'Lemon Milk';
+  letter-spacing: 2px;
+  color: #0c4a6e;
+  text-shadow: 2px 4px 8px rgba(12,74,110,0.2);
+}
+
+.message-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.9rem;
+  margin-top: 25px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.highlight {
+  font-family: 'Lemon Milk';
+  color: var(--primary);
+  letter-spacing: 2px;
+  margin-top: 20px;
+  display: block;
+  font-size: 1.4rem;
+}
+
+/* Button */
+.gift-btn {
+  margin-top: 40px;
+  background: var(--dark-blue);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-family: 'Lemon Milk';
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.4s ease;
+  box-shadow: 0 15px 35px rgba(29,78,216,0.25);
+}
+
+.gift-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  background: #0c4a6e;
+}
+
+/* Back Button */
+.back-btn {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background: white;
+  color: var(--dark-blue);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-family: 'Lemon Milk';
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(29,78,216,0.15);
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  transform: translateY(-5px);
+}
+</style>
+</head>
+
+<body>
+
+<a href="music.html" class="back-btn">← Go Back</a>
+
+<div class="gift-card">
+  <h1>THIS IS YOUR FINAL GIFT 💙</h1>
+
+  <div class="message-text">
+    
+  </div>
+
+  <span class="highlight">
+    A simple gift...  
+  </span>
+
+  <!-- CHANGE THIS LINK TO WHERE YOU WANT -->
+  <a href="https://baap21560-blip.github.io/birthday-gift-/" class="gift-btn">
+    OPEN YOUR REAL SURPRISE →
+  </a>
+</div>
+
+</body>
+</html>

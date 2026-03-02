@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dedicated Playlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        @font-face {
+            font-family: 'Lemon Milk';
+            src: url('https://db.onlinewebfonts.com/t/718a746f364746864115f5d625d911b3.woff2') format('woff2');
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 16px;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .playlist-box {
+            background: rgba(224, 242, 254, 0.95);
+            border-radius: 40px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 25px 50px -12px rgba(12, 74, 110, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            /* Smooth entry for the whole box */
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title {
+            font-family: 'Lemon Milk', sans-serif;
+            color: #0c4a6e;
+            letter-spacing: 1px;
+            text-shadow: 2px 4px 8px rgba(12, 74, 110, 0.1);
+        }
+
+        .now-playing {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .play-btn:active { transform: scale(0.85); }
+
+        .play-btn.playing {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+
+        .carousel-viewport {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            height: 210px;
+            display: flex;
+            align-items: center;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+
+        .cards-wrapper {
+            display: flex;
+            align-items: center;
+            /* SMOOTH SPRING TRANSITION */
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding-left: calc(50% - 70px); 
+        }
+
+        .song-card {
+            min-width: 140px;
+            max-width: 140px;
+            background: white;
+            border-radius: 24px;
+            padding: 10px;
+            margin-right: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            /* SMOOTH OPACITY & SCALE */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.4;
+            transform: scale(0.8);
+            cursor: pointer;
+        }
+
+        .song-card.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 15px 25px rgba(14, 165, 233, 0.2);
+            border: 2px solid #0ea5e9;
+        }
+
+        .song-card img {
+            border-radius: 18px;
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+
+        .progress-container {
+            height: 8px;
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 10px;
+            margin: 20px 4px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        #bar {
+            height: 100%;
+            width: 0%;
+            background: #0ea5e9;
+            border-radius: 10px;
+            /* SMOOTH PROGRESS GLIDE */
+            transition: width 0.4s linear;
+        }
+
+        .step-btn {
+            background: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            color: #0ea5e9;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .step-btn:active { transform: scale(0.8); }
+
+        .nav-btn-floating {
+            position: fixed;
+            bottom: 30px;
+            background: white;
+            color: #0ea5e9;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-family: 'Lemon Milk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+            text-decoration: none;
+            border: 1px solid rgba(14, 165, 233, 0.1);
+        }
+
+        .btn-left { left: 30px; }
+        .btn-right { right: 30px; }
+
+        .nav-btn-floating:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: #0ea5e9;
+            color: white;
+            box-shadow: 0 15px 30px rgba(14, 165, 233, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="window.history.back()" class="nav-btn-floating btn-left">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+    <span>Go Back</span>
+</button>
+
+<a href="gift.html" class="nav-btn-floating btn-right">
+    <span>Next Page →</span>
+</a>
+
+<div class="playlist-box">
+    <p class="text-center text-[9px] uppercase font-bold text-sky-600 tracking-[0.3em] mb-1">Your Special Tape</p>
+    <h1 class="title text-xl text-center mb-4">Sweet Melodies</h1>
+
+    <div class="now-playing">
+        <div class="play-btn" id="masterPlay" onclick="togglePlay()">
+            <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="overflow-hidden">
+            <p class="font-bold text-sky-900 truncate text-sm transition-all duration-300" id="nowTitle">Loading...</p>
+            <p class="text-[10px] uppercase font-bold text-sky-400" id="nowStatus">Ready</p>
+        </div>
+    </div>
+
+    <div class="carousel-viewport" id="viewport">
+        <div class="cards-wrapper" id="cardsWrapper"></div>
+    </div>
+
+    <div class="progress-container" id="progCont">
+        <div id="bar"></div>
+    </div>
+
+    <div class="flex justify-between items-center px-2">
+        <button onclick="prev()" class="step-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <span class="text-[10px] font-bold text-sky-300 uppercase tracking-widest">Swipe for more</span>
+        <button onclick="next()" class="step-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+    </div>
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+    const songs = [
+        { title: 'Mockingbird', src: 'music1.mp3', img: 'https://i.pinimg.com/736x/2f/28/74/2f2874cb89259481d7d5c5fe672b6990.jpg' },
+        { title: 'The Perfect Pair', src: 'music2.mp3', img: 'https://i.pinimg.com/736x/f1/d2/74/f1d274478e433beb92dfaf619ba9904f.jpg' },
+        { title: 'Ocean Eyes', src: 'music3.mp3', img: 'https://i.pinimg.com/1200x/7d/56/36/7d5636ffb3b2057617187eb81d2487bf.jpg' },
+        { title: 'Baby You', src: 'music4.mp3', img: 'https://i.pinimg.com/736x/33/5f/ae/335faea0339929bba9fa72c6b53298af.jpg' },
+        { title: 'Just a Boy', src: 'music5.mp3', img: 'https://i.pinimg.com/1200x/90/ad/fa/90adfadb9ebbc94288435e0016ff047d.jpg' }
+    ];
+
+    let index = 0;
+    const audio = document.getElementById('audio');
+    const cardsWrapper = document.getElementById('cardsWrapper');
+    const bar = document.getElementById('bar');
+    
+    function init() {
+        cardsWrapper.innerHTML = songs.map((s, i) => `
+            <div class="song-card" onclick="selectSong(${i})">
+                <img src="${s.img}">
+                <p class="text-xs font-bold text-sky-800 truncate text-center">${s.title}</p>
+            </div>
+        `).join('');
+        updateUI();
+        loadSong(index);
+    }
+
+    function updateUI() {
+        const cards = document.querySelectorAll('.song-card');
+        cards.forEach((c, i) => c.classList.toggle('active', i === index));
+        const move = index * 160;
+        cardsWrapper.style.transform = `translateX(-${move}px)`;
+        
+        const titleEl = document.getElementById('nowTitle');
+        titleEl.style.opacity = '0';
+        setTimeout(() => {
+            titleEl.innerText = songs[index].title;
+            titleEl.style.opacity = '1';
+        }, 150);
+    }
+
+    function loadSong(i) {
+        audio.src = songs[i].src;
+        audio.load();
+    }
+
+    function selectSong(i) {
+        const wasPlaying = !audio.paused;
+        index = i;
+        updateUI();
+        loadSong(index);
+        if (wasPlaying) playAudio();
+    }
+
+    function playAudio() {
+        audio.play().then(() => {
+            document.getElementById('masterPlay').classList.add('playing');
+            document.getElementById('playIcon').innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            document.getElementById('nowStatus').innerText = "Playing";
+        }).catch(() => {
+            document.getElementById('nowStatus').innerText = "Ready";
+        });
+    }
+
+    function togglePlay() {
+        if (audio.paused) playAudio();
+        else {
+            audio.pause();
+            document.getElementById('masterPlay').classList.remove('playing');
+            document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+            document.getElementById('nowStatus').innerText = "Paused";
+        }
+    }
+
+    function next() {
+        index = (index + 1) % songs.length;
+        selectSong(index);
+        playAudio(); 
+    }
+
+    function prev() {
+        index = (index - 1 + songs.length) % songs.length;
+        selectSong(index);
+        playAudio();
+    }
+
+    document.getElementById('progCont').onclick = (e) => {
+        const pct = e.offsetX / e.currentTarget.offsetWidth;
+        if(audio.duration) audio.currentTime = pct * audio.duration;
+    };
+
+    audio.ontimeupdate = () => {
+        if(audio.duration) bar.style.width = (audio.currentTime / audio.duration) * 100 + '%';
+    };
+
+    audio.onended = next;
+
+    let startX = 0;
+    document.getElementById('viewport').addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    document.getElementById('viewport').addEventListener('touchend', e => {
+        const endX = e.changedTouches[0].clientX;
+        if (startX - endX > 50) next();
+        else if (startX - endX < -50) prev();
+    });
+
+    init();
+</script>
+</body>
+</html>
+
